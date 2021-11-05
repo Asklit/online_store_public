@@ -17,6 +17,9 @@ class PasswordError(Exception):
     pass
 
 
+NAME_DATABASE = "online_store_database.sqlite"
+
+
 class EntryWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -80,7 +83,7 @@ class EntryWindow(QMainWindow):
         elif self.password_input.text() == "":
             self.move_password("Введите пароль")
         elif self.correct_data() and self.correct_data_in_database():
-            self.MainWindow = MainWindow(self, "")
+            self.MainWindow = MainWindow(self, self.curent_id)
             self.MainWindow.show()
             self.hide()
 
@@ -92,14 +95,14 @@ class EntryWindow(QMainWindow):
         elif len(self.password_input.text()) > 20:
             self.move_password("Ваш пароль слишком длинный")
         elif self.correct_data():
-            con = sqlite3.connect("customer_data.sqlite")
+            con = sqlite3.connect(NAME_DATABASE)
             cur = con.cursor()
             number = self.number
             password = self.password_input.text()
             data = cur.execute(f"""SELECT title FROM information
                                     WHERE title = '{number}'""").fetchall()
             if len(data) == 0:
-                con = sqlite3.connect("customer_data.sqlite")
+                con = sqlite3.connect(NAME_DATABASE)
                 cur = con.cursor()
                 cur.execute(f"""INSERT INTO information(title, password)
                                          VALUES('{number}', '{password}')""").fetchall()
@@ -146,7 +149,7 @@ class EntryWindow(QMainWindow):
         try:
             number = self.number
             password = self.password_input.text()
-            con = sqlite3.connect("customer_data.sqlite")
+            con = sqlite3.connect(NAME_DATABASE)
             cur = con.cursor()
             correct_number = cur.execute(f"""SELECT title FROM information
                                             WHERE title = '{number}'""").fetchall()
@@ -157,6 +160,8 @@ class EntryWindow(QMainWindow):
             if len(correct_password) == 0:
                 raise PasswordError("Введите корректный пароль")
             else:
+                self.curent_id = cur.execute(f"""SELECT id FROM information
+                                            WHERE title = '{number}'""").fetchall()[0][0]
                 return True
         except NumberError as ne:
             self.move_number(ne)

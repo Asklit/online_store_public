@@ -8,15 +8,17 @@ from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QLineEdit, QTableView, QCheckBox, QPushButton, QTableWidget, \
     QTableWidgetItem, QHeaderView, QInputDialog, QMessageBox
 
+from work_with_db import save_db, get_result_from_db
 
-NAME_DATABASE = "price_list.sqlite"
+NAME_DATABASE = "online_store_database.sqlite"
 
 
 class MainWindow(QWidget):
     def __init__(self, *args):
         super().__init__()
+        self.current_id = args[1]
         self.sorting = True
-        self.item_in_basket = []
+        self.item_in_basket = get_result_from_db(self.current_id)
         self.initUI(args)
 
     def initUI(self, args):
@@ -135,21 +137,27 @@ class MainWindow(QWidget):
             self.btn_no = self.messagebox.addButton("Нет", QMessageBox.NoRole)
             self.btn_no.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
             self.messagebox.show()
+            flag = True
             if self.messagebox.exec_() == 0:
                 for i in items:
                     if i not in self.item_in_basket:
-                        self.item_in_basket.append(i)
-                if len(items) > 1:
-                    self.status_bar.setText('Предметы успешно добавлены в корзину')
-                else:
-                    self.status_bar.setText('Предмет успешно добавлен в корзину')
+                        self.item_in_basket[i] = 1
+                    else:
+                        self.status_bar.setText("Выбранный товар уже в корзине")
+                        flag = False
+                        break
+                if flag:
+                    if len(items) > 1:
+                        self.status_bar.setText('Предметы успешно добавлены в корзину')
+                    else:
+                        self.status_bar.setText('Предмет успешно добавлен в корзину')
             else:
                 self.status_bar.setText('')
         else:
             self.status_bar.setText('Выберите товары')
 
     def open_cart(self):
-        self.Cart = Cart(self, self.item_in_basket)
+        self.Cart = Cart(self, self.item_in_basket, self.current_id)
         self.Cart.show()
         self.hide()
 
@@ -181,9 +189,13 @@ class MainWindow(QWidget):
             self.sorting = True
         self.fill_in_the_table()
 
+    def closeEvent(self, event):
+        save_db(self.item_in_basket, self.current_id)
+
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
+
 
 # app = QApplication(sys.argv)
 # # app.setStyle('Fusion')
