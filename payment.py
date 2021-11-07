@@ -88,9 +88,9 @@ def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 
 
-app = QApplication(sys.argv)
-# app.setStyle('Fusion')
-ex = Payment()
-ex.show()
-sys.excepthook = except_hook
-sys.exit(app.exec())
+# app = QApplication(sys.argv)
+# # app.setStyle('Fusion')
+# ex = Payment()
+# ex.show()
+# sys.excepthook = except_hook
+# sys.exit(app.exec())
