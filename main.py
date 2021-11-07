@@ -71,7 +71,7 @@ class MainWindow(QWidget):
         self.btn_find = QPushButton("Добавить в корзину в корзину", self)
         self.btn_find.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
         self.btn_find.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
-        self.btn_find.setGeometry(290, 550, 200, 20)
+        self.btn_find.setGeometry(270, 550, 200, 20)
         self.btn_find.clicked.connect(self.add_to_card)
 
         self.sorting = QLabel("Сортировка:", self)
@@ -80,7 +80,7 @@ class MainWindow(QWidget):
         self.sorting.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
 
         self.btn_sorting = QPushButton("Сначала дорогие", self)
-        self.btn_sorting.setGeometry(320, 42, 150, 18)
+        self.btn_sorting.setGeometry(320, 42, 152, 18)
         self.btn_sorting.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
         self.btn_sorting.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_sorting.clicked.connect(self.table_sorting)

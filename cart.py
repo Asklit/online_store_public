@@ -255,7 +255,6 @@ class Cart(QWidget):
                 self.move_cost()
                 self.status_delete.setText("Успешно изменено количество товара")
             except InvalidValue as iv:
-                print(self.tableWidget.currentRow(), self.tableWidget.item(self.tableWidget.currentRow(), 0).text())
                 self.tableWidget.currentItem().setText(
                     str(self.item_in_basket[self.tableWidget.item(self.tableWidget.currentRow(), 0).text()]) + 'шт.')
                 self.status_delete.setText(str(iv))
