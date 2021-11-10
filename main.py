@@ -26,11 +26,11 @@ class MainWindow(QWidget):
         self.setFixedSize(500, 600)
         self.setWindowTitle('Angels Shop')
 
-        self.pixmap = QPixmap('2b2b2b.png')
+        self.pixmap = QPixmap('pictures/2b2b2b.png')
         self.backend = QLabel(self)
         self.backend.setPixmap(self.pixmap)
 
-        self.pixmap = QPixmap('separator.png')
+        self.pixmap = QPixmap('pictures/separator.png')
         self.separator = QLabel(self)
         self.separator.setGeometry(0, 38, 500, 2)
         self.separator.setPixmap(self.pixmap)
@@ -71,7 +71,7 @@ class MainWindow(QWidget):
         self.btn_find = QPushButton("Добавить в корзину в корзину", self)
         self.btn_find.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
         self.btn_find.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
-        self.btn_find.setGeometry(270, 550, 200, 20)
+        self.btn_find.setGeometry(280, 550, 190, 20)
         self.btn_find.clicked.connect(self.add_to_card)
 
         self.sorting = QLabel("Сортировка:", self)
@@ -84,6 +84,10 @@ class MainWindow(QWidget):
         self.btn_sorting.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
         self.btn_sorting.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_sorting.clicked.connect(self.table_sorting)
+
+    def update(self):
+        self.item_in_basket = get_result_from_db(self.current_id)
+        self.fill_in_the_table()
 
     def fill_in_the_table(self):
         con = sqlite3.connect(NAME_DATABASE)
@@ -137,15 +141,16 @@ class MainWindow(QWidget):
             self.btn_no = self.messagebox.addButton("Нет", QMessageBox.NoRole)
             self.btn_no.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
             self.messagebox.show()
-            flag = True
             if self.messagebox.exec_() == 0:
+                flag = True
                 for i in items:
-                    if i not in self.item_in_basket:
-                        self.item_in_basket[i] = 1
-                    else:
-                        self.status_bar.setText("Выбранный товар уже в корзине")
+                    if i in self.item_in_basket:
                         flag = False
-                        break
+                if flag:
+                    for i in items:
+                        self.item_in_basket[i] = 1
+                else:
+                    self.status_bar.setText("Выбранный товар уже в корзине")
                 if flag:
                     if len(items) > 1:
                         self.status_bar.setText('Предметы успешно добавлены в корзину')
@@ -162,7 +167,7 @@ class MainWindow(QWidget):
         self.hide()
 
     def paint_over_contours(self):
-        self.pixmap = QPixmap('2b2b2b.png')
+        self.pixmap = QPixmap('pictures/2b2b2b.png')
         self.backend_table_widget = QLabel(self)
         self.backend_table_widget.setGeometry(5, 40, 490, 24)
         self.backend_table_widget.setPixmap(self.pixmap)
@@ -190,7 +195,30 @@ class MainWindow(QWidget):
         self.fill_in_the_table()
 
     def closeEvent(self, event):
-        save_db(self.item_in_basket, self.current_id)
+        self.messagebox_close = QtWidgets.QMessageBox(self)
+        self.messagebox_close.setIcon(QMessageBox.NoIcon)
+        self.messagebox_close.setStyleSheet(
+            'QMessageBox {'
+            'font: Times bold 16px;'
+            'border: 1px solid #2b2b2b;'
+            'border-radius: 1px;'
+            'background-color: #2b2b2b;}'
+            'QMessageBox QLabel {'
+            'color: #1790ff}'
+            'QPushButton {'
+            'background-color: #1790ff;'
+            ' color: #e5eaf1;}')
+        self.messagebox_close.setWindowTitle("Подтверждение выхода")
+        self.messagebox_close.setText("Вы уверены, что хотите выйти из приложения?")
+        self.btn_yes = self.messagebox_close.addButton("Да", QMessageBox.YesRole)
+        self.btn_yes.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
+        self.btn_no = self.messagebox_close.addButton("Нет", QMessageBox.NoRole)
+        self.btn_no.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
+        if self.messagebox_close.exec_() == 0:
+            save_db(self.item_in_basket, self.current_id)
+            event.accept()
+        else:
+            event.ignore()
 
 
 def except_hook(cls, exception, traceback):

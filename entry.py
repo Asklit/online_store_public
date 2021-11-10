@@ -31,12 +31,12 @@ class EntryWindow(QMainWindow):
         self.setFixedSize(400, 360)
         self.setWindowTitle('Angels Shop Entry')
 
-        self.pixmap = QPixmap('2b2b2b.png')
+        self.pixmap = QPixmap('pictures/2b2b2b.png')
         self.backend = QLabel(self)
         self.backend.resize(400, 400)
         self.backend.setPixmap(self.pixmap)
 
-        self.pixmap = QPixmap('logo_blue.png')
+        self.pixmap = QPixmap('pictures/logo_blue.png')
         self.image = QLabel(self)
         self.image.move(20, 5)
         self.image.resize(360, 204)

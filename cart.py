@@ -2,9 +2,9 @@ import sqlite3
 import sys
 
 from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QRegExpValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QTableWidget, QApplication, QTableWidgetItem, QPushButton, QMessageBox, \
-    QAbstractItemView
+    QAbstractItemView, QLineEdit
 
 from payment import Payment
 
@@ -32,11 +32,11 @@ class Cart(QWidget):
         self.setFixedSize(690, 280)
         self.setWindowTitle('Cart')
 
-        self.pixmap = QPixmap('2b2b2b.png')
+        self.pixmap = QPixmap('pictures/2b2b2b.png')
         self.backend = QLabel(self)
         self.backend.setPixmap(self.pixmap)
 
-        self.pixmap = QPixmap('separator.png')
+        self.pixmap = QPixmap('pictures/separator.png')
         self.separator = QLabel(self)
         self.separator.setGeometry(0, 38, 800, 2)
         self.separator.setPixmap(self.pixmap)
@@ -91,7 +91,6 @@ class Cart(QWidget):
         self.tableWidget.setGeometry(5, 40, 400, 200)
         self.tableWidget.setStyleSheet('QTableWidget {background-color: #3c3f41; color: #a9b1b4;}')
         self.tableWidget.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
-        # self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.tableWidget.itemChanged.connect(self.change_finished)
@@ -108,6 +107,7 @@ class Cart(QWidget):
             self.tableWidget.setRowCount(0)
             self.tableWidget.setColumnCount(0)
             self.paint_over_contours(0)
+            self.status_delete.setText("В корзине по ничего нет")
         else:
             con = sqlite3.connect(NAME_DATABASE)
             cur = con.cursor()
@@ -167,18 +167,15 @@ class Cart(QWidget):
                     del self.item_in_basket[elem]
                 self.fill_in_the_table()
                 self.change_cost()
-                self.status_delete.setText("Предметы успешно удалены")
                 self.move_cost()
+                self.status_delete.setText("Предметы успешно удалены")
         else:
             if len(self.item_in_basket) != 0:
                 self.status_delete.setText("Выберите товары")
                 self.move_cost()
 
     def change_cost(self):
-        if len(self.item_in_basket) == 1:
-            self.calculation.setText(f"Итого: {len(self.item_in_basket)} товар на {str(self.finding_cost())}р.")
-        else:
-            self.calculation.setText(f"Итого: {len(self.item_in_basket)} товара на {str(self.finding_cost())}р.")
+        self.calculation.setText(f"Итого: {str(self.finding_count())} шт. на {str(self.finding_cost())}р.")
 
     def finding_cost(self):
         con = sqlite3.connect(NAME_DATABASE)
@@ -197,6 +194,9 @@ class Cart(QWidget):
             amount += int(elem) * int(data[index])
         return amount
 
+    def finding_count(self):
+        return sum([int(i[:-3]) for i in self.get_data()])
+
     def get_data(self):
         data = []
         for i in range(self.tableWidget.rowCount()):
@@ -205,7 +205,7 @@ class Cart(QWidget):
 
     def paint_over_contours(self, *args):
         self.table_create = True
-        self.pixmap = QPixmap('2b2b2b.png')
+        self.pixmap = QPixmap('pictures/2b2b2b.png')
         self.backend_table_widget = QLabel(self)
         self.backend_table_widget.setGeometry(5, 40, 400, 24)
         self.backend_table_widget.setPixmap(self.pixmap)
@@ -230,26 +230,42 @@ class Cart(QWidget):
         self.payment.move(410, 170)
 
     def open_payment(self):
-        self.Payment = Payment(self, self.item_in_basket)
-        self.Payment.show()
-        self.hide()
+        self.fill_in_the_table()
+        if self.status_delete.text() != "В корзине по ничего нет":
+            save_db(self.item_in_basket, self.current_id)
+            self.Payment = Payment(self, self.item_in_basket, self.current_id, self.main)
+            self.Payment.show()
+            self.hide()
 
     def change_finished(self):
-        if self.table_create:
+        if self.table_create and self.tableWidget.currentColumn() == 2:
             try:
                 text = self.tableWidget.currentItem().text()
-                if len(text) <= 3:
+                text = "".join(text.split())
+                if len(text) == 0:
                     raise InvalidValue('Неверный формат количества товаров')
-                elif text[-3:] != 'шт.':
-                    raise InvalidValue('Неверный формат количества товаров')
-                elif text[0] == '0':
-                    raise InvalidValue('Неверный формат количества товаров')
-                for i in text[:-3]:
-                    if not i.isdigit():
+                elif len(text) == 1:
+                    if not(len(text) == 1 and text[0] != '0' and text[0].isdigit()):
                         raise InvalidValue('Неверный формат количества товаров')
-                if len(text[:-3]) != 1:
-                    raise InvalidValue('Данный товар доступен не более 9 штук')
-                self.item_in_basket[self.tableWidget.item(self.tableWidget.currentRow(), 0).text()] = text[:-3]
+                elif len(text) == 4:
+                    if text[-3:] != 'шт.':
+                        raise InvalidValue('Неверный формат количества товаров')
+                    elif text[0] == '0':
+                        raise InvalidValue('Неверный формат количества товаров')
+                    for i in text[:-3]:
+                        if not i.isdigit():
+                            raise InvalidValue('Неверный формат количества товаров')
+                    if len(text[:-3]) != 1:
+                        raise InvalidValue('Данный товар доступен не более 9 штук')
+                else:
+                    if text[0].isdigit() and text[1].isdigit():
+                        raise InvalidValue('Данный товар доступен не более 9 штук')
+                    else:
+                        raise InvalidValue('Неверный формат количества товаров')
+                if self.item_in_basket[self.tableWidget.item(self.tableWidget.currentRow(), 0).text()] == text[0]:
+                    raise InvalidValue('Введите новое число')
+                self.item_in_basket[self.tableWidget.item(self.tableWidget.currentRow(), 0).text()] = text[0]
+                self.tableWidget.currentItem().setText(text[0] + 'шт.')
                 self.change_cost()
                 self.finding_cost()
                 self.move_cost()
@@ -261,7 +277,30 @@ class Cart(QWidget):
                 self.move_cost()
 
     def closeEvent(self, event):
-        save_db(self.item_in_basket, self.current_id)
+        self.messagebox_close = QtWidgets.QMessageBox(self)
+        self.messagebox_close.setIcon(QMessageBox.NoIcon)
+        self.messagebox_close.setStyleSheet(
+                'QMessageBox {'
+                'font: Times bold 16px;'
+                'border: 1px solid #2b2b2b;'
+                'border-radius: 1px;'
+                'background-color: #2b2b2b;}'
+                'QMessageBox QLabel {'
+                'color: #1790ff}'
+                'QPushButton {'
+                'background-color: #1790ff;'
+                ' color: #e5eaf1;}')
+        self.messagebox_close.setWindowTitle("Подтверждение выхода")
+        self.messagebox_close.setText("Вы уверены, что хотите выйти из приложения?")
+        self.btn_yes = self.messagebox_close.addButton("Да", QMessageBox.YesRole)
+        self.btn_yes.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
+        self.btn_no = self.messagebox_close.addButton("Нет", QMessageBox.NoRole)
+        self.btn_no.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
+        if self.messagebox_close.exec_() == 0:
+            save_db(self.item_in_basket, self.current_id)
+            event.accept()
+        else:
+            event.ignore()
 
 
 def except_hook(cls, exception, traceback):
