@@ -1,6 +1,5 @@
 import sqlite3
 
-
 NAME_DATABASE = "online_store_database.sqlite"
 
 
@@ -19,7 +18,7 @@ def save_db(basket, current_id):
 
         con.commit()
     id_order = cur.execute(f"""SELECT id FROM orders
-                                                WHERE id_client = {current_id}""").fetchall()
+                               WHERE id_client = {current_id} and status = 'not paid'""").fetchall()
     cur.execute(f"""DELETE from order_items
                             WHERE id_order = {id_order[0][0]}""").fetchall()
     con.commit()
@@ -58,6 +57,6 @@ def make_status_paid(current_id, index):
                                     WHERE id_client = {current_id} and status = 'not paid'""").fetchall()
     else:
         update_db = cur.execute(f"""UPDATE orders
-                                            SET status = 'paid'
-                                            WHERE id_client = {current_id} and status = 'payment in the store'""").fetchall()
+                                    SET status = 'payment in the store'
+                                    WHERE id_client = {current_id} and status = 'not paid'""").fetchall()
     con.commit()

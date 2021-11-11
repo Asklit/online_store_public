@@ -18,25 +18,30 @@ class PasswordError(Exception):
 
 
 NAME_DATABASE = "online_store_database.sqlite"
+BACKGROUND_PICTURE = 'pictures/2b2b2b.png'
+PHOTO_SCREENSAVER = 'pictures/logo_blue.png'
 
 
 class EntryWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.q_label_style = 'QLabel {color: #1790ff;}'
+        self.q_line_edit_style = 'QLineEdit {background-color: #1790ff; color: #e5eaf1; border: 1px solid #1790ff;}'
+        self.q_push_button_style = 'QPushButton {background-color: #1790ff; color: #e5eaf1;}'
         self.number = 0
+        self.initUI()
 
     def initUI(self):
         self.move(200, 200)
         self.setFixedSize(400, 360)
         self.setWindowTitle('Angels Shop Entry')
 
-        self.pixmap = QPixmap('pictures/2b2b2b.png')
+        self.pixmap = QPixmap(BACKGROUND_PICTURE)
         self.backend = QLabel(self)
         self.backend.resize(400, 400)
         self.backend.setPixmap(self.pixmap)
 
-        self.pixmap = QPixmap('pictures/logo_blue.png')
+        self.pixmap = QPixmap(PHOTO_SCREENSAVER)
         self.image = QLabel(self)
         self.image.move(20, 5)
         self.image.resize(360, 204)
@@ -44,37 +49,35 @@ class EntryWindow(QMainWindow):
 
         self.email_input = QLineEdit("", self)
         self.email_input.setPlaceholderText("Телефон")
-        self.email_input.setStyleSheet('QLineEdit {background-color: #1790ff; color: #e5eaf1;'
-                                       ' border: 1px solid #1790ff;}')
+        self.email_input.setStyleSheet(self.q_line_edit_style)
         self.email_input.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.email_input.setGeometry(50, 195, 300, 20)
 
         self.password_input = QLineEdit("", self)
         self.password_input.setPlaceholderText("Пароль")
-        self.password_input.setStyleSheet('QLineEdit {background-color: #1790ff; color: #e5eaf1;'
-                                          ' border: 1px solid #1790ff;}')
+        self.password_input.setStyleSheet(self.q_line_edit_style)
         self.password_input.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.password_input.setGeometry(50, 220, 300, 20)
         self.password_input.setEchoMode(QLineEdit.Password)
 
         self.btn_auth = QPushButton("Авторизация", self)
-        self.btn_auth.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_auth.setStyleSheet(self.q_push_button_style)
         self.btn_auth.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_auth.setGeometry(50, 270, 300, 20)
         self.btn_auth.clicked.connect(self.authorization)
 
         self.btn_reg = QPushButton("Регистрация", self)
-        self.btn_reg.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_reg.setStyleSheet(self.q_push_button_style)
         self.btn_reg.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_reg.setGeometry(50, 295, 300, 20)
         self.btn_reg.clicked.connect(self.registration)
 
         self.number_error = QLabel("", self)
-        self.number_error.setStyleSheet('QLabel {color: #1790ff;}')
+        self.number_error.setStyleSheet(self.q_label_style)
         self.number_error.resize(300, 20)
 
         self.password_error = QLabel("", self)
-        self.password_error.setStyleSheet('QLabel {color: #1790ff;}')
+        self.password_error.setStyleSheet(self.q_label_style)
         self.password_error.resize(300, 20)
 
     def authorization(self):

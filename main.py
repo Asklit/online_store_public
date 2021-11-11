@@ -11,11 +11,21 @@ from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QLineEdit, QTableView
 from work_with_db import save_db, get_result_from_db
 
 NAME_DATABASE = "online_store_database.sqlite"
+BACKGROUND_PICTURE = 'pictures/2b2b2b.png'
+SEPARATOR_PICTURES = 'pictures/separator.png'
 
 
 class MainWindow(QWidget):
     def __init__(self, *args):
         super().__init__()
+        self.q_label_style = 'QLabel {color: #1790ff;}'
+        self.q_line_edit_style = 'QLineEdit {background-color: #1790ff; color: #e5eaf1; border: 1px solid #1790ff;}'
+        self.q_push_button_style = 'QPushButton {background-color: #1790ff; color: #e5eaf1;}'
+        self.q_table_widget_style = 'QTableWidget {background-color: #3c3f41; color: #a9b1b4;}'
+        self.q_message_box_style = 'QMessageBox {font: Times bold 16px; border: 1px solid #2b2b2b;' \
+                                   ' border-radius: 1px; background-color: #2b2b2b;}' \
+                                   ' QMessageBox QLabel {color: #1790ff} ' \
+                                   'QPushButton {background-color: #1790ff; color: #e5eaf1;}'
         self.current_id = args[1]
         self.sorting = True
         self.item_in_basket = get_result_from_db(self.current_id)
@@ -26,11 +36,11 @@ class MainWindow(QWidget):
         self.setFixedSize(500, 600)
         self.setWindowTitle('Angels Shop')
 
-        self.pixmap = QPixmap('pictures/2b2b2b.png')
+        self.pixmap = QPixmap(BACKGROUND_PICTURE)
         self.backend = QLabel(self)
         self.backend.setPixmap(self.pixmap)
 
-        self.pixmap = QPixmap('pictures/separator.png')
+        self.pixmap = QPixmap(SEPARATOR_PICTURES)
         self.separator = QLabel(self)
         self.separator.setGeometry(0, 38, 500, 2)
         self.separator.setPixmap(self.pixmap)
@@ -38,30 +48,29 @@ class MainWindow(QWidget):
         self.name_shop = QLabel("Angels Shop", self)
         self.name_shop.setGeometry(5, 5, 120, 30)
         self.name_shop.setFont(QtGui.QFont("Times", 14, QtGui.QFont.Bold))
-        self.name_shop.setStyleSheet('QLabel {color: #1790ff;}')
+        self.name_shop.setStyleSheet(self.q_label_style)
 
         self.input_request = QLineEdit(self)
         self.input_request.setGeometry(130, 10, 290, 20)
         self.input_request.setPlaceholderText("Название")
-        self.input_request.setStyleSheet('QLineEdit {background-color: #1790ff; color: #e5eaf1;'
-                                         ' border: 1px solid #1790ff;}')
+        self.input_request.setStyleSheet(self.q_line_edit_style)
         self.input_request.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.input_request.textChanged.connect(self.fill_in_the_table)
 
         self.btn_basket = QPushButton("Корзина", self)
-        self.btn_basket.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_basket.setStyleSheet(self.q_push_button_style)
         self.btn_basket.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_basket.setGeometry(430, 10, 60, 20)
         self.btn_basket.clicked.connect(self.open_cart)
 
         self.status_bar = QLabel("", self)
         self.status_bar.setGeometry(29, 550, 250, 20)
-        self.status_bar.setStyleSheet('QLabel {color: #1790ff;}')
+        self.status_bar.setStyleSheet(self.q_label_style)
         self.status_bar.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
 
         self.tableWidget = QTableWidget(self)
         self.tableWidget.setGeometry(5, 40, 490, 500)
-        self.tableWidget.setStyleSheet('QTableWidget {background-color: #3c3f41; color: #a9b1b4;}')
+        self.tableWidget.setStyleSheet(self.q_table_widget_style)
         self.tableWidget.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
@@ -69,23 +78,23 @@ class MainWindow(QWidget):
         self.fill_in_the_table()
 
         self.btn_find = QPushButton("Добавить в корзину в корзину", self)
-        self.btn_find.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_find.setStyleSheet(self.q_push_button_style)
         self.btn_find.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_find.setGeometry(280, 550, 190, 20)
         self.btn_find.clicked.connect(self.add_to_card)
 
         self.sorting = QLabel("Сортировка:", self)
         self.sorting.setGeometry(230, 42, 100, 18)
-        self.sorting.setStyleSheet('QLabel {color: #1790ff;}')
+        self.sorting.setStyleSheet(self.q_label_style)
         self.sorting.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
 
         self.btn_sorting = QPushButton("Сначала дорогие", self)
         self.btn_sorting.setGeometry(320, 42, 152, 18)
-        self.btn_sorting.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_sorting.setStyleSheet(self.q_push_button_style)
         self.btn_sorting.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_sorting.clicked.connect(self.table_sorting)
 
-    def update(self):
+    def update_table(self):
         self.item_in_basket = get_result_from_db(self.current_id)
         self.fill_in_the_table()
 
@@ -123,17 +132,7 @@ class MainWindow(QWidget):
         if items:
             self.messagebox = QtWidgets.QMessageBox(self)
             self.messagebox.setIcon(QMessageBox.NoIcon)
-            self.messagebox.setStyleSheet(
-                    'QMessageBox {'
-                    'font: Times bold 16px;'
-                    'border: 1px solid #2b2b2b;'    
-                    'border-radius: 1px;'
-                    'background-color: #2b2b2b;}'
-                    'QMessageBox QLabel {'
-                    'color: #1790ff}'
-                    'QPushButton {'
-                    'background-color: #1790ff;'
-                    'color: #e5eaf1;}')
+            self.messagebox.setStyleSheet(self.q_message_box_style)
             self.messagebox.setWindowTitle("Подтверждение добавления")
             self.messagebox.setText("Вы уверены, что хотите добавить " + ", ".join(items) + " в корзину?")
             self.btn_yes = self.messagebox.addButton("Да", QMessageBox.YesRole)
@@ -167,7 +166,7 @@ class MainWindow(QWidget):
         self.hide()
 
     def paint_over_contours(self):
-        self.pixmap = QPixmap('pictures/2b2b2b.png')
+        self.pixmap = QPixmap(BACKGROUND_PICTURE)
         self.backend_table_widget = QLabel(self)
         self.backend_table_widget.setGeometry(5, 40, 490, 24)
         self.backend_table_widget.setPixmap(self.pixmap)
@@ -197,17 +196,7 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         self.messagebox_close = QtWidgets.QMessageBox(self)
         self.messagebox_close.setIcon(QMessageBox.NoIcon)
-        self.messagebox_close.setStyleSheet(
-            'QMessageBox {'
-            'font: Times bold 16px;'
-            'border: 1px solid #2b2b2b;'
-            'border-radius: 1px;'
-            'background-color: #2b2b2b;}'
-            'QMessageBox QLabel {'
-            'color: #1790ff}'
-            'QPushButton {'
-            'background-color: #1790ff;'
-            ' color: #e5eaf1;}')
+        self.messagebox_close.setStyleSheet(self.q_message_box_style)
         self.messagebox_close.setWindowTitle("Подтверждение выхода")
         self.messagebox_close.setText("Вы уверены, что хотите выйти из приложения?")
         self.btn_yes = self.messagebox_close.addButton("Да", QMessageBox.YesRole)
@@ -223,7 +212,6 @@ class MainWindow(QWidget):
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
 
 # app = QApplication(sys.argv)
 # # app.setStyle('Fusion')

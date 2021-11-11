@@ -10,8 +10,9 @@ from payment import Payment
 
 from work_with_db import save_db
 
-
 NAME_DATABASE = "online_store_database.sqlite"
+BACKGROUND_PICTURE = 'pictures/2b2b2b.png'
+SEPARATOR_PICTURES = 'pictures/separator.png'
 
 
 class InvalidValue(Exception):
@@ -21,6 +22,14 @@ class InvalidValue(Exception):
 class Cart(QWidget):
     def __init__(self, *args):
         super().__init__()
+        self.q_label_style = 'QLabel {color: #1790ff;}'
+        self.q_line_edit_style = 'QLineEdit {background-color: #1790ff; color: #e5eaf1; border: 1px solid #1790ff;}'
+        self.q_push_button_style = 'QPushButton {background-color: #1790ff; color: #e5eaf1;}'
+        self.q_table_widget_style = 'QTableWidget {background-color: #3c3f41; color: #a9b1b4;}'
+        self.q_message_box_style = 'QMessageBox {font: Times bold 16px; border: 1px solid #2b2b2b;' \
+                                   ' border-radius: 1px; background-color: #2b2b2b;}' \
+                                   ' QMessageBox QLabel {color: #1790ff} ' \
+                                   'QPushButton {background-color: #1790ff; color: #e5eaf1;}'
         self.item_in_basket = args[1]
         self.main = args[0]
         self.current_id = args[2]
@@ -32,11 +41,11 @@ class Cart(QWidget):
         self.setFixedSize(690, 280)
         self.setWindowTitle('Cart')
 
-        self.pixmap = QPixmap('pictures/2b2b2b.png')
+        self.pixmap = QPixmap(BACKGROUND_PICTURE)
         self.backend = QLabel(self)
         self.backend.setPixmap(self.pixmap)
 
-        self.pixmap = QPixmap('pictures/separator.png')
+        self.pixmap = QPixmap(SEPARATOR_PICTURES)
         self.separator = QLabel(self)
         self.separator.setGeometry(0, 38, 800, 2)
         self.separator.setPixmap(self.pixmap)
@@ -44,22 +53,22 @@ class Cart(QWidget):
         self.name_shop = QLabel("Корзина", self)
         self.name_shop.setGeometry(29, 5, 120, 30)
         self.name_shop.setFont(QtGui.QFont("Times", 14, QtGui.QFont.Bold))
-        self.name_shop.setStyleSheet('QLabel {color: #1790ff;}')
+        self.name_shop.setStyleSheet(self.q_label_style)
         self.name_shop.setFont(QtGui.QFont("Times", 14, QtGui.QFont.Bold))
 
         self.status_bar = QLabel("", self)
         self.status_bar.setGeometry(5, 550, 250, 20)
-        self.status_bar.setStyleSheet('QLabel {color: #1790ff;}')
+        self.status_bar.setStyleSheet(self.q_label_style)
         self.status_bar.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
 
         self.btn_back = QPushButton("Вернуться в католог для выбора товара", self)
-        self.btn_back.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_back.setStyleSheet(self.q_push_button_style)
         self.btn_back.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_back.setGeometry(410, 120, 250, 20)
         self.btn_back.clicked.connect(self.back_to_catalog)
 
         self.btn_main_back = QPushButton("Вернуться в католог для выбора товара", self)
-        self.btn_main_back.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_main_back.setStyleSheet(self.q_push_button_style)
         self.btn_main_back.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_main_back.setGeometry(29, 75, 250, 20)
         self.btn_main_back.hide()
@@ -72,24 +81,24 @@ class Cart(QWidget):
         self.bar.hide()
 
         self.btn_delete = QPushButton("Удалить выбранные товары из корзины", self)
-        self.btn_delete.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.btn_delete.setStyleSheet(self.q_push_button_style)
         self.btn_delete.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_delete.setGeometry(410, 64, 250, 20)
         self.btn_delete.clicked.connect(self.delete_from_cart)
 
         self.status_delete = QLabel("", self)
         self.status_delete.setGeometry(410, 89, 250, 20)
-        self.status_delete.setStyleSheet('QLabel {color: #1790ff;}')
+        self.status_delete.setStyleSheet(self.q_label_style)
         self.status_delete.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
 
         self.calculation = QLabel("", self)
         self.calculation.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.calculation.setGeometry(410, 89, 250, 20)
-        self.calculation.setStyleSheet('QLabel {color: #1790ff;}')
+        self.calculation.setStyleSheet(self.q_label_style)
 
         self.tableWidget = QTableWidget(self)
         self.tableWidget.setGeometry(5, 40, 400, 200)
-        self.tableWidget.setStyleSheet('QTableWidget {background-color: #3c3f41; color: #a9b1b4;}')
+        self.tableWidget.setStyleSheet(self.q_table_widget_style)
         self.tableWidget.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
@@ -97,7 +106,7 @@ class Cart(QWidget):
         self.fill_in_the_table()
 
         self.payment = QPushButton("Оформить заказ", self)
-        self.payment.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;}')
+        self.payment.setStyleSheet(self.q_push_button_style)
         self.payment.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.payment.setGeometry(410, 150, 250, 20)
         self.payment.clicked.connect(self.open_payment)
@@ -144,17 +153,7 @@ class Cart(QWidget):
         if items:
             self.messagebox = QtWidgets.QMessageBox(self)
             self.messagebox.setIcon(QMessageBox.NoIcon)
-            self.messagebox.setStyleSheet(
-                'QMessageBox {'
-                'font: Times bold 16px;'
-                'border: 1px solid #2b2b2b;'
-                'border-radius: 1px;'
-                'background-color: #2b2b2b;}'
-                'QMessageBox QLabel {'
-                'color: #1790ff}'
-                'QPushButton {'
-                'background-color: #1790ff;'
-                ' color: #e5eaf1;}')
+            self.messagebox.setStyleSheet(self.q_message_box_style)
             self.messagebox.setWindowTitle("Подтверждение удаления из корзины")
             self.messagebox.setText("Вы уверены, что хотите удалить " + ", ".join(items) + " из корзины?")
             self.btn_yes = self.messagebox.addButton("Да", QMessageBox.YesRole)
@@ -205,7 +204,7 @@ class Cart(QWidget):
 
     def paint_over_contours(self, *args):
         self.table_create = True
-        self.pixmap = QPixmap('pictures/2b2b2b.png')
+        self.pixmap = QPixmap(BACKGROUND_PICTURE)
         self.backend_table_widget = QLabel(self)
         self.backend_table_widget.setGeometry(5, 40, 400, 24)
         self.backend_table_widget.setPixmap(self.pixmap)
@@ -231,7 +230,7 @@ class Cart(QWidget):
 
     def open_payment(self):
         self.fill_in_the_table()
-        if self.status_delete.text() != "В корзине по ничего нет":
+        if self.status_delete.text() != "В корзине пока ничего нет":
             save_db(self.item_in_basket, self.current_id)
             self.Payment = Payment(self, self.item_in_basket, self.current_id, self.main)
             self.Payment.show()
@@ -245,7 +244,7 @@ class Cart(QWidget):
                 if len(text) == 0:
                     raise InvalidValue('Неверный формат количества товаров')
                 elif len(text) == 1:
-                    if not(len(text) == 1 and text[0] != '0' and text[0].isdigit()):
+                    if not (len(text) == 1 and text[0] != '0' and text[0].isdigit()):
                         raise InvalidValue('Неверный формат количества товаров')
                 elif len(text) == 4:
                     if text[-3:] != 'шт.':
@@ -279,17 +278,7 @@ class Cart(QWidget):
     def closeEvent(self, event):
         self.messagebox_close = QtWidgets.QMessageBox(self)
         self.messagebox_close.setIcon(QMessageBox.NoIcon)
-        self.messagebox_close.setStyleSheet(
-                'QMessageBox {'
-                'font: Times bold 16px;'
-                'border: 1px solid #2b2b2b;'
-                'border-radius: 1px;'
-                'background-color: #2b2b2b;}'
-                'QMessageBox QLabel {'
-                'color: #1790ff}'
-                'QPushButton {'
-                'background-color: #1790ff;'
-                ' color: #e5eaf1;}')
+        self.messagebox_close.setStyleSheet(self.q_message_box_style)
         self.messagebox_close.setWindowTitle("Подтверждение выхода")
         self.messagebox_close.setText("Вы уверены, что хотите выйти из приложения?")
         self.btn_yes = self.messagebox_close.addButton("Да", QMessageBox.YesRole)
@@ -305,7 +294,6 @@ class Cart(QWidget):
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
 
 # app = QApplication(sys.argv)
 # # app.setStyle('Fusion')
