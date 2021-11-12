@@ -116,7 +116,7 @@ class Cart(QWidget):
             self.tableWidget.setRowCount(0)
             self.tableWidget.setColumnCount(0)
             self.paint_over_contours(0)
-            self.status_delete.setText("В корзине по ничего нет")
+            self.status_delete.setText("В корзине пока ничего нет")
         else:
             con = sqlite3.connect(NAME_DATABASE)
             cur = con.cursor()

@@ -60,3 +60,26 @@ def make_status_paid(current_id, index):
                                     SET status = 'payment in the store'
                                     WHERE id_client = {current_id} and status = 'not paid'""").fetchall()
     con.commit()
+
+
+def get_order_id(current_id):
+    con = sqlite3.connect(NAME_DATABASE)
+    cur = con.cursor()
+    id_order = cur.execute(f"""SELECT id from orders
+                                WHERE id_client = {current_id} and status = 'not paid'""").fetchall()
+    return id_order[0]
+
+
+def get_data_for_receipt(id_order):
+    con = sqlite3.connect(NAME_DATABASE)
+    cur = con.cursor()
+    data = cur.execute(f"""SELECT
+                            price_list.title,
+                            order_items.count_product,
+                            price_list.price
+                            FROM
+                            order_items
+                            INNER JOIN price_list
+                            ON price_list.id = order_items.id_product
+                            WHERE order_items.id_order = {id_order}""").fetchall()
+    return data

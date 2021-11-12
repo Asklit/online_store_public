@@ -7,7 +7,8 @@ from PyQt5.QtGui import QPixmap, QRegExpValidator, QIntValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QTableWidget, QApplication, QTableWidgetItem, QPushButton, QMessageBox, \
     QTabWidget, QTextEdit, QFormLayout, QLineEdit, QCheckBox
 
-from work_with_db import make_status_paid
+from save_in_txt import save_in_txt_file
+from work_with_db import make_status_paid, get_order_id
 
 NAME_DATABASE = "online_store_database.sqlite"
 BACKGROUND_PICTURE = 'pictures/2b2b2b.png'
@@ -36,6 +37,7 @@ class Payment(QWidget):
         self.id = args[2]
         self.main = args[3]
         self.status_paid = True
+        self.saved = True
         self.initUI(args)
 
     def initUI(self, args):
@@ -179,13 +181,13 @@ class Payment(QWidget):
         self.save_txt = QPushButton("Сохранить чек в txt файл", self)
         self.save_txt.setStyleSheet('QPushButton {background-color: #1790ff; color: #e5eaf1;} '
                                     'QPushButton::hover {background-color: #red; color: #e5eaf1;}')
-        self.save_txt.setEnabled(False)
         self.save_txt.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
-        self.save_txt.setGeometry(10, 390, 250, 20)
+        self.save_txt.hide()
+        self.save_txt.setGeometry(270, 390, 350, 20)
         self.save_txt.clicked.connect(self.save_in_txt)
 
         self.status_bar = QLabel("", self)
-        self.status_bar.setGeometry(10, 420, 380, 20)
+        self.status_bar.setGeometry(10, 390, 242, 20)
         self.status_bar.setStyleSheet(self.q_label_style)
         self.status_bar.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold))
 
@@ -195,11 +197,11 @@ class Payment(QWidget):
         self.btn_payment.setGeometry(270, 390, 350, 20)
         self.btn_payment.clicked.connect(self.payment)
 
-        self.btn_payment = QPushButton("Вернуться в корзину", self)
-        self.btn_payment.setStyleSheet(self.q_push_button_style)
-        self.btn_payment.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold))
-        self.btn_payment.setGeometry(270, 420, 350, 20)
-        self.btn_payment.clicked.connect(self.back_to_cart)
+        self.btn_back = QPushButton("Вернуться в корзину", self)
+        self.btn_back.setStyleSheet(self.q_push_button_style)
+        self.btn_back.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold))
+        self.btn_back.setGeometry(10, 390, 242, 20)
+        self.btn_back.clicked.connect(self.back_to_cart)
 
     def change_validator_cvc(self):
         if len(self.sender().text()) == 2:
@@ -291,15 +293,20 @@ class Payment(QWidget):
     def payment(self):
         if self.status_paid:
             if self.correct_cart():
+                self.order_id = get_order_id(self.id)
                 make_status_paid(self.id, self.tab_payment.currentIndex())
                 self.status_paid = False
                 self.status_bar.setText("Оплата прошла")
-                self.btn_payment.setText("Вернуться в каталог")
-                self.btn_payment.clicked.connect(self.back_to_catalog)
+                self.move_widget()
+                self.save_txt.show()
+                self.btn_back.setText("Вернуться в каталог")
+                self.btn_back.clicked.connect(self.back_to_catalog)
             else:
                 self.status_bar.setText("Введите данные карты")
+                self.move_widget()
         else:
-            self.status_bar.setText("Заказ оплачен, вернитесь в каталог")
+            self.status_bar.setText("Заказ уже оплачен")
+            self.move_widget()
 
     def correct_cart(self):
         if self.tab_payment.currentIndex() == 0:
@@ -337,7 +344,16 @@ class Payment(QWidget):
             event.ignore()
 
     def save_in_txt(self):
-        pass
+        if self.saved:
+            save_in_txt_file(self.tab.currentIndex(), self.tab_payment.currentIndex(), self.order_id[0])
+            self.status_bar.setText("Чек успешно сохранен в файл")
+            self.saved = False
+        else:
+            self.status_bar.setText("Чек уже сохранен")
+
+    def move_widget(self):
+        self.btn_payment.move(270, 420)
+        self.btn_back.move(10, 420)
 
 
 def except_hook(cls, exception, traceback):
