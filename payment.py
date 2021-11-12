@@ -42,7 +42,7 @@ class Payment(QWidget):
 
     def initUI(self, args):
         self.move(200, 200)
-        self.setFixedSize(800, 600)
+        self.setFixedSize(630, 450)
         self.setWindowTitle('Payment')
 
         self.pixmap = QPixmap(BACKGROUND_PICTURE)
