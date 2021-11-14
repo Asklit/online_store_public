@@ -77,7 +77,7 @@ class MainWindow(QWidget):
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.fill_in_the_table()
 
-        self.btn_find = QPushButton("Добавить в корзину в корзину", self)
+        self.btn_find = QPushButton("Добавить в корзину", self)
         self.btn_find.setStyleSheet(self.q_push_button_style)
         self.btn_find.setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))
         self.btn_find.setGeometry(280, 550, 190, 20)
