@@ -15,7 +15,7 @@ def save_in_txt_file(index_place_of_receipt, index_payment_method, order_id):
             place_of_receipt = "Муравейник, ул. Пушкина, 76, Пермь\n"
         f.write(f"{place_of_receipt}\n")
         data = get_data_for_receipt(order_id)
-        f.write('Место рачетов\n')
+        f.write('Место расчетов\n')
         list_items = [f'{elem[0]} {elem[2][:-2]} x {elem[1]} = {int(elem[2][:-2]) * int(elem[1])}' for elem in data]
         max_len = -1
         for elem in list_items:
