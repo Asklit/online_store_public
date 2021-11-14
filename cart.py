@@ -146,6 +146,7 @@ class Cart(QWidget):
     def back_to_catalog(self):
         self.hide()
         self.main.show()
+        self.main.status_bar.setText("")
 
     def delete_from_cart(self):
         rows = list(set([i.row() for i in self.tableWidget.selectedItems()]))
