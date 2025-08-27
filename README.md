@@ -1,14 +1,74 @@
-# Интернет магазин
-## Автор проекта: Ханжин Александр
-## Идеей проекта является создание оконного приложения (с помощью библиотека PyQt5), реализующего работу интернет магазина.
-## Порядок запуска: 1) установить PyQt5 2) Запустить файл entry.py
-При запуске открывается меню авторизации и регистрации (класс Entry), на котором можно создать или зарегистрировать аккаунт. Ввод данных реализован с помощью QLineEdit, действия с помощью QPushButton. Помимо этого, на телефон и пароль должны быть корректными. Номер телефона должен иметь вид (+7 *** *** ** ** или 8 *** *** ** **). Пароль должен быть не более 20 символов. Все проверки реализуются с помощью try, except, raise. При регистрации данные пользователя заносятся в SQL таблицу. При регистрации происходит проверка совпадения данных пользователя с данными таблицы.
-## ![Image alt](pictures/entry.png)
-При нажатии кнопки авторизации и введенными корректными данными открывается новое окно, в котором пользователь может искать товары в SQL таблице, добавлять товары в корзину и переходить в корзину. Для ввода поисковых данных используется QLineEdit, для отображения данных из SQL таблицы используется QTableWidget, для добавления используется QPushButton. При попытке ввода данных в QLineEdit, происходит запрос к базе дынных и корректный вывод в таблицу QTableWidget. При нажатии кнопки добавления в корзину в выбранными элементами таблицы открывается диалоговое окно с подтверждением действий пользователя. Если товары для удаления не выделены об этом сообщается пользователю с помощью try, except, raise.
-## ![Image alt](pictures/basket.png)
-При нажатии кнопки перехода в корзину открывается окно корзины. В корзине пользователь может удалять данные из корзины, изменять их количество, при отсутствие таковых пользователю предлагается перейти на окно выбора товаров. При нажатии кнопки удаления открывается диалоговое окно для подтверждения действий пользователя. Если товары для удаления не выделены об этом сообщается пользователю с помощью try, except, raise. Также реализована таблица QTableWidget с отображением товаров в таблице. 
-## ![Image alt](pictures/main.png)
-При нажатии на кнопку оплаты товара, если в корзине присутствуют товары, открывается новое окно оплаты заказа. У пользователя есть возможность выбора способа оплаты заказа, места получения заказа. Выбор способа оплаты и места получения отображается с помощью QTabWidget (Виджета, который я изучил самостоятельно). В способе получения товара пользователь просто выбирает место получения(по умолчанию центратьный магазин). В способе оплаты товара онлайн пользователю предоставляется возможность ввода своих данных банковской карты. С помощью функции setValidator проверяется корректность ввода данных(номер карты - 16 чисел от 1 до 9, месяц - число от 01 до 12, год от 01 до 99, CVC - от 001 до 999). Так же есть кнопка оплаты заказа и возвращения в корзину. Помимо этого после оплаты товара пользователю предоставляется возможность сохранить чек в txt файл.
-## ![Image alt](pictures/payment.png)
-Для работы оконного приложения создана база данных с четырьмя таблицами. В первой таблице сохраняются данные пользователей(номер телефона, пароль), второй - хранятся данные товаров(название, цена). Третья и четвертая таблицы связаны между собой. В третьей таблице хранятся данные о заказах(статус заказа, id клиента), четвертой - позиции заказов(id товара, id заказа, количество товаров).
-Для корректной работы приложения нужно установить библиотеку PyQt5.
+# Online Store
+
+## Project Author: Alexander Khanzhin
+
+## Project Description
+  The project is a desktop application developed using the **PyQt5** library, implementing the functionality of an online store. Users can register, log in, search for products, add them to the cart, manage cart contents, and proceed to payment.
+
+## Launch Instructions
+  1. Install the **PyQt5** library:
+     ```bash
+     pip install pyqt5
+     ```
+  2. Run the entry.py file.
+
+## Main Functionality
+
+1. Authorization and Registration
+    - Upon launching the application, a login/registration window (class Entry) is displayed.
+    - Users can create a new account or log in to an existing one.
+    - Data input is handled via QLineEdit, and actions are performed using QPushButton.
+    - Data validation:
+        - Phone number: format +7 *** *** ** ** or 8 *** *** ** **.
+        - Password: maximum 20 characters.
+    
+    - Validation is implemented using try, except, raise constructs.
+    - User data is stored in an SQL table during registration.
+    - During login, the entered data is verified against the database.Login Window
+
+2. Product Search and Addition
+
+    - After successful login, the main window opens. 
+    - Users can:
+      - Search for products in the SQL table using QLineEdit.
+      - View products in a QTableWidget.
+      - Add products to the cart using QPushButton.
+    - Adding to the cart triggers a dialog window for confirmation.
+    - If no products are selected, an error message is displayed (try, except, raise).Product Window
+
+3. Cart
+
+     - In the cart window, users can:
+       - Remove products.
+       - Adjust product quantities.
+       - Return to the product selection window if the cart is empty.
+    - Product removal prompts a dialog window for confirmation.
+    - If no products are selected for removal, an error message is shown (try, except, raise).
+    - Products are displayed in a QTableWidget.Cart Window
+
+4. Order Payment
+
+    - If the cart contains products, users can proceed to payment.
+    - Features:
+      - Selection of payment method and delivery location via QTabWidget.
+      - For online payment, users enter bank card details:
+          - Card number: 16 digits (1–9).
+          - Month: 01–12.
+          - Year: 01–99.
+          - CVC: 001–999.
+    - Input validation is handled using setValidator.
+    - After payment, users can save a receipt as a .txt file.
+    - A button to return to the cart is available.Payment Window
+
+## Databade
+  
+  The application uses a database with four tables:
+  
+  1. Users: stores phone number and password.
+  2. Products: contains product name and price.
+  3. Orders: stores order status and client ID.
+  4. Order Items: links product ID, order ID, and product quantity.
+  
+  Tables 3 and 4 are interconnected for accurate order tracking.
+  
+
